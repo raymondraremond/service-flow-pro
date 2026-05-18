@@ -14,16 +14,306 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      media_assets: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          height: number | null
+          id: string
+          kind: string
+          storage_path: string
+          width: number | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          height?: number | null
+          id?: string
+          kind: string
+          storage_path: string
+          width?: number | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          height?: number | null
+          id?: string
+          kind?: string
+          storage_path?: string
+          width?: number | null
+        }
+        Relationships: []
+      }
+      presentation_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          owner_id: string | null
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          owner_id?: string | null
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          owner_id?: string | null
+          slug?: string
+        }
+        Relationships: []
+      }
+      presentation_state: {
+        Row: {
+          current_slide_index: number
+          current_song_id: string | null
+          id: string
+          mode: Database["public"]["Enums"]["presentation_mode"]
+          payload: Json
+          session_id: string
+          updated_at: string
+        }
+        Insert: {
+          current_slide_index?: number
+          current_song_id?: string | null
+          id?: string
+          mode?: Database["public"]["Enums"]["presentation_mode"]
+          payload?: Json
+          session_id: string
+          updated_at?: string
+        }
+        Update: {
+          current_slide_index?: number
+          current_song_id?: string | null
+          id?: string
+          mode?: Database["public"]["Enums"]["presentation_mode"]
+          payload?: Json
+          session_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "presentation_state_current_song_id_fkey"
+            columns: ["current_song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "presentation_state_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "presentation_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      service_items: {
+        Row: {
+          created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["service_item_kind"]
+          payload: Json
+          position: number
+          ref_id: string | null
+          service_order_id: string
+          title: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: Database["public"]["Enums"]["service_item_kind"]
+          payload?: Json
+          position: number
+          ref_id?: string | null
+          service_order_id: string
+          title?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["service_item_kind"]
+          payload?: Json
+          position?: number
+          ref_id?: string | null
+          service_order_id?: string
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_items_service_order_id_fkey"
+            columns: ["service_order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_orders: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          service_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          service_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          service_date?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      song_slides: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          position: number
+          song_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          position: number
+          song_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          position?: number
+          song_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "song_slides_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      songs: {
+        Row: {
+          artist: string | null
+          category: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          number: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          artist?: string | null
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          number?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          artist?: string | null
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          number?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "operator"
+      presentation_mode:
+        | "slide"
+        | "black"
+        | "logo"
+        | "verse"
+        | "media"
+        | "blank"
+      service_item_kind: "song" | "scripture" | "announcement" | "media"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +440,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "operator"],
+      presentation_mode: ["slide", "black", "logo", "verse", "media", "blank"],
+      service_item_kind: ["song", "scripture", "announcement", "media"],
+    },
   },
 } as const
