@@ -79,7 +79,7 @@ function Editor() {
       kind,
       title,
       ref_id: refId,
-      payload,
+      payload: payload as never,
     });
     if (error) return toast.error(error.message);
     refresh();

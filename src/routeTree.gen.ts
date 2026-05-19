@@ -17,6 +17,7 @@ import { Route as AppSongsIndexRouteImport } from './routes/app/songs/index'
 import { Route as AppServicesIndexRouteImport } from './routes/app/services/index'
 import { Route as AppSongsNewRouteImport } from './routes/app/songs/new'
 import { Route as AppSongsSongIdRouteImport } from './routes/app/songs/$songId'
+import { Route as AppServicesServiceIdRouteImport } from './routes/app/services/$serviceId'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -58,12 +59,18 @@ const AppSongsSongIdRoute = AppSongsSongIdRouteImport.update({
   path: '/app/songs/$songId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppServicesServiceIdRoute = AppServicesServiceIdRouteImport.update({
+  id: '/app/services/$serviceId',
+  path: '/app/services/$serviceId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/live/$slug': typeof LiveSlugRoute
   '/app/': typeof AppIndexRoute
+  '/app/services/$serviceId': typeof AppServicesServiceIdRoute
   '/app/songs/$songId': typeof AppSongsSongIdRoute
   '/app/songs/new': typeof AppSongsNewRoute
   '/app/services/': typeof AppServicesIndexRoute
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/live/$slug': typeof LiveSlugRoute
   '/app': typeof AppIndexRoute
+  '/app/services/$serviceId': typeof AppServicesServiceIdRoute
   '/app/songs/$songId': typeof AppSongsSongIdRoute
   '/app/songs/new': typeof AppSongsNewRoute
   '/app/services': typeof AppServicesIndexRoute
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/live/$slug': typeof LiveSlugRoute
   '/app/': typeof AppIndexRoute
+  '/app/services/$serviceId': typeof AppServicesServiceIdRoute
   '/app/songs/$songId': typeof AppSongsSongIdRoute
   '/app/songs/new': typeof AppSongsNewRoute
   '/app/services/': typeof AppServicesIndexRoute
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/live/$slug'
     | '/app/'
+    | '/app/services/$serviceId'
     | '/app/songs/$songId'
     | '/app/songs/new'
     | '/app/services/'
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/live/$slug'
     | '/app'
+    | '/app/services/$serviceId'
     | '/app/songs/$songId'
     | '/app/songs/new'
     | '/app/services'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/live/$slug'
     | '/app/'
+    | '/app/services/$serviceId'
     | '/app/songs/$songId'
     | '/app/songs/new'
     | '/app/services/'
@@ -128,6 +140,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   LiveSlugRoute: typeof LiveSlugRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppServicesServiceIdRoute: typeof AppServicesServiceIdRoute
   AppSongsSongIdRoute: typeof AppSongsSongIdRoute
   AppSongsNewRoute: typeof AppSongsNewRoute
   AppServicesIndexRoute: typeof AppServicesIndexRoute
@@ -192,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSongsSongIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/services/$serviceId': {
+      id: '/app/services/$serviceId'
+      path: '/app/services/$serviceId'
+      fullPath: '/app/services/$serviceId'
+      preLoaderRoute: typeof AppServicesServiceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -200,6 +220,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   LiveSlugRoute: LiveSlugRoute,
   AppIndexRoute: AppIndexRoute,
+  AppServicesServiceIdRoute: AppServicesServiceIdRoute,
   AppSongsSongIdRoute: AppSongsSongIdRoute,
   AppSongsNewRoute: AppSongsNewRoute,
   AppServicesIndexRoute: AppServicesIndexRoute,
