@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/layout/AppShell";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -56,7 +56,7 @@ function Services() {
     <div className="mx-auto max-w-3xl p-5">
       <h1 className="mb-1 text-2xl font-semibold">Services</h1>
       <p className="mb-5 text-sm text-white/50">
-        Create a run-sheet for the service. (Item ordering coming in next iteration.)
+        Plan the service run-sheet: songs, scripture, announcements — one click to push each item live.
       </p>
       <div className="mb-5 flex gap-2">
         <input
@@ -78,11 +78,17 @@ function Services() {
         )}
         <ul className="divide-y divide-white/5">
           {services.data?.map((s) => (
-            <li key={s.id} className="px-4 py-3">
-              <div className="font-medium">{s.name}</div>
-              <div className="text-xs text-white/40">
-                {new Date(s.created_at).toLocaleDateString()}
-              </div>
+            <li key={s.id}>
+              <Link
+                to="/app/services/$serviceId"
+                params={{ serviceId: s.id }}
+                className="block px-4 py-3 hover:bg-white/5"
+              >
+                <div className="font-medium">{s.name}</div>
+                <div className="text-xs text-white/40">
+                  {new Date(s.created_at).toLocaleDateString()}
+                </div>
+              </Link>
             </li>
           ))}
         </ul>
