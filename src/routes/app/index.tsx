@@ -227,6 +227,8 @@ function DashboardInner() {
           <BigButton variant="ghost" onClick={clear} className="col-span-2">Clear (Esc)</BigButton>
         </div>
 
+        <QuickCast sessionId={sessionId} />
+
         {sessionSlug && (
           <div className="rounded-xl border border-white/10 bg-zinc-900/40 p-3 text-xs text-white/60">
             <div className="mb-1 font-semibold uppercase tracking-wider text-white/50">Projector URL</div>
