@@ -11,6 +11,7 @@ import {
 } from "@/hooks/usePresentation";
 import { BigButton } from "@/components/control/BigButton";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { QuickCast } from "@/components/control/QuickCast";
 import { toast, Toaster } from "sonner";
 
 export const Route = createFileRoute("/app/")({
@@ -225,6 +226,8 @@ function DashboardInner() {
           <BigButton onClick={logo} active={state?.mode === "logo"}>Logo (L)</BigButton>
           <BigButton variant="ghost" onClick={clear} className="col-span-2">Clear (Esc)</BigButton>
         </div>
+
+        <QuickCast sessionId={sessionId} />
 
         {sessionSlug && (
           <div className="rounded-xl border border-white/10 bg-zinc-900/40 p-3 text-xs text-white/60">
