@@ -11,6 +11,7 @@ import {
 } from "@/hooks/usePresentation";
 import { BigButton } from "@/components/control/BigButton";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { QuickCast } from "@/components/control/QuickCast";
 import { toast, Toaster } from "sonner";
 
 export const Route = createFileRoute("/app/")({
