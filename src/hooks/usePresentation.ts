@@ -136,9 +136,10 @@ export async function updatePresentation(
   sessionId: string,
   patch: Partial<Omit<PresentationState, "id" | "session_id" | "updated_at">>
 ) {
+  const body = { ...(patch as Record<string, unknown>), updated_at: new Date().toISOString() };
   const { error } = await supabase
     .from("presentation_state")
-    .update({ ...(patch as never), updated_at: new Date().toISOString() } as never)
+    .update(body as never)
     .eq("session_id", sessionId);
   if (error) throw error;
 }
