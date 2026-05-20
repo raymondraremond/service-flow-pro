@@ -117,6 +117,14 @@ function Editor() {
     refresh();
   };
 
+  const remove = async (id: string) => {
+    if (!confirm("Remove this item?")) return;
+    await supabase.from("service_items").delete().eq("id", id);
+    refresh();
+  };
+
+
+
 
 
   const goLive = async (item: ServiceItem) => {
@@ -187,7 +195,25 @@ function Editor() {
         )}
         <ul className="divide-y divide-white/5">
           {itemsQ.data?.map((it, i) => (
-            <li key={it.id} className="flex items-center gap-3 px-4 py-3 hover:bg-white/5">
+            <li
+              key={it.id}
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.setData("text/plain", it.id);
+                e.dataTransfer.effectAllowed = "move";
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "move";
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                const sourceId = e.dataTransfer.getData("text/plain");
+                if (sourceId && sourceId !== it.id) reorderTo(sourceId, i);
+              }}
+              className="flex cursor-grab items-center gap-3 px-4 py-3 hover:bg-white/5 active:cursor-grabbing"
+            >
+              <div className="text-white/30 select-none">⋮⋮</div>
               <div className="grid size-8 place-items-center rounded-md bg-white/5 text-xs font-bold text-white/50">
                 {i + 1}
               </div>
@@ -215,6 +241,7 @@ function Editor() {
     </div>
   );
 }
+
 
 function KindBadge({ kind }: { kind: ItemKind }) {
   const map: Record<ItemKind, string> = {
