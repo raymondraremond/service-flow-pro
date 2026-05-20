@@ -52,6 +52,7 @@ export type Database = {
           name: string
           owner_id: string | null
           slug: string
+          theme: Json
         }
         Insert: {
           created_at?: string
@@ -60,6 +61,7 @@ export type Database = {
           name: string
           owner_id?: string | null
           slug: string
+          theme?: Json
         }
         Update: {
           created_at?: string
@@ -68,6 +70,7 @@ export type Database = {
           name?: string
           owner_id?: string | null
           slug?: string
+          theme?: Json
         }
         Relationships: []
       }
@@ -77,6 +80,7 @@ export type Database = {
           current_song_id: string | null
           id: string
           mode: Database["public"]["Enums"]["presentation_mode"]
+          overlay: Json
           payload: Json
           session_id: string
           updated_at: string
@@ -86,6 +90,7 @@ export type Database = {
           current_song_id?: string | null
           id?: string
           mode?: Database["public"]["Enums"]["presentation_mode"]
+          overlay?: Json
           payload?: Json
           session_id: string
           updated_at?: string
@@ -95,6 +100,7 @@ export type Database = {
           current_song_id?: string | null
           id?: string
           mode?: Database["public"]["Enums"]["presentation_mode"]
+          overlay?: Json
           payload?: Json
           session_id?: string
           updated_at?: string
@@ -313,6 +319,7 @@ export type Database = {
         | "verse"
         | "media"
         | "blank"
+        | "countdown"
       service_item_kind: "song" | "scripture" | "announcement" | "media"
     }
     CompositeTypes: {
@@ -442,7 +449,15 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "operator"],
-      presentation_mode: ["slide", "black", "logo", "verse", "media", "blank"],
+      presentation_mode: [
+        "slide",
+        "black",
+        "logo",
+        "verse",
+        "media",
+        "blank",
+        "countdown",
+      ],
       service_item_kind: ["song", "scripture", "announcement", "media"],
     },
   },

@@ -91,10 +91,29 @@ function Editor() {
     const j = i + dir;
     if (i < 0 || j < 0 || j >= items.length) return;
     const a = items[i], b = items[j];
-    // swap positions
     await supabase.from("service_items").update({ position: -1 }).eq("id", a.id);
     await supabase.from("service_items").update({ position: a.position }).eq("id", b.id);
     await supabase.from("service_items").update({ position: b.position }).eq("id", a.id);
+    refresh();
+  };
+
+  const reorderTo = async (sourceId: string, targetIndex: number) => {
+    const items = [...(itemsQ.data ?? [])];
+    const srcIdx = items.findIndex((x) => x.id === sourceId);
+    if (srcIdx === -1) return;
+    const [moved] = items.splice(srcIdx, 1);
+    items.splice(targetIndex, 0, moved);
+    // Two-pass to dodge unique constraint races: write negative tmp positions first
+    await Promise.all(
+      items.map((it, i) =>
+        supabase.from("service_items").update({ position: -(i + 1) - 1000 }).eq("id", it.id)
+      )
+    );
+    await Promise.all(
+      items.map((it, i) =>
+        supabase.from("service_items").update({ position: i }).eq("id", it.id)
+      )
+    );
     refresh();
   };
 
@@ -103,6 +122,10 @@ function Editor() {
     await supabase.from("service_items").delete().eq("id", id);
     refresh();
   };
+
+
+
+
 
   const goLive = async (item: ServiceItem) => {
     if (!sessionId) return toast.error("No live session yet");
@@ -172,7 +195,25 @@ function Editor() {
         )}
         <ul className="divide-y divide-white/5">
           {itemsQ.data?.map((it, i) => (
-            <li key={it.id} className="flex items-center gap-3 px-4 py-3 hover:bg-white/5">
+            <li
+              key={it.id}
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.setData("text/plain", it.id);
+                e.dataTransfer.effectAllowed = "move";
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "move";
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                const sourceId = e.dataTransfer.getData("text/plain");
+                if (sourceId && sourceId !== it.id) reorderTo(sourceId, i);
+              }}
+              className="flex cursor-grab items-center gap-3 px-4 py-3 hover:bg-white/5 active:cursor-grabbing"
+            >
+              <div className="text-white/30 select-none">⋮⋮</div>
               <div className="grid size-8 place-items-center rounded-md bg-white/5 text-xs font-bold text-white/50">
                 {i + 1}
               </div>
@@ -200,6 +241,7 @@ function Editor() {
     </div>
   );
 }
+
 
 function KindBadge({ kind }: { kind: ItemKind }) {
   const map: Record<ItemKind, string> = {
