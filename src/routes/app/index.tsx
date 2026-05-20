@@ -8,10 +8,14 @@ import {
   ensureDefaultSession,
   updatePresentation,
   usePresentation,
+  useSession,
 } from "@/hooks/usePresentation";
 import { BigButton } from "@/components/control/BigButton";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { QuickCast } from "@/components/control/QuickCast";
+import { AlertBar } from "@/components/control/AlertBar";
+import { CountdownPanel } from "@/components/control/CountdownPanel";
+import { ThemePanel } from "@/components/control/ThemePanel";
 import { toast, Toaster } from "sonner";
 
 export const Route = createFileRoute("/app/")({
@@ -43,8 +47,10 @@ function DashboardInner() {
   }, [user]);
 
   const { state, connected } = usePresentation(sessionId);
+  const session = useSession(sessionId);
   const [search, setSearch] = useState("");
   const [selectedSongId, setSelectedSongId] = useState<string | null>(null);
+  const [rightTab, setRightTab] = useState<"control" | "alerts" | "theme">("control");
 
   const songs = useQuery({
     queryKey: ["songs", search],
@@ -107,7 +113,7 @@ function DashboardInner() {
   useKeyboardShortcuts({ onNext: next, onPrev: prev, onBlack: black, onLogo: logo, onClear: clear });
 
   return (
-    <div className="grid grid-cols-1 gap-4 p-4 lg:grid-cols-[320px_1fr_360px]">
+    <div className="grid grid-cols-1 gap-4 p-4 lg:grid-cols-[320px_1fr_380px]">
       {/* Song picker */}
       <section className="rounded-xl border border-white/10 bg-zinc-900/40 p-3">
         <div className="mb-3 flex items-center justify-between">
@@ -191,7 +197,7 @@ function DashboardInner() {
         )}
       </section>
 
-      {/* Now live + big controls */}
+      {/* Right column */}
       <section className="space-y-4">
         <div className="rounded-xl border border-white/10 bg-zinc-900/40 p-3">
           <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-white/70">Now Live</h2>
@@ -207,6 +213,8 @@ function DashboardInner() {
                 ? state.payload?.slides?.[state.current_slide_index] ?? ""
                 : state?.mode === "verse"
                 ? state.payload?.verse_text ?? ""
+                : state?.mode === "countdown"
+                ? `⏱ ${state.payload?.countdown_message ?? "Countdown"}`
                 : state?.mode === "logo"
                 ? "[ LOGO SCREEN ]"
                 : state?.mode === "black"
@@ -215,6 +223,11 @@ function DashboardInner() {
             </div>
             {state?.payload?.song_title && state.mode === "slide" && (
               <div className="mt-2 text-xs uppercase tracking-wider text-white/40">{state.payload.song_title}</div>
+            )}
+            {state?.overlay?.alert && (
+              <div className="mt-3 rounded border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+                ⚠ Alert: {state.overlay.alert}
+              </div>
             )}
           </div>
         </div>
@@ -227,23 +240,75 @@ function DashboardInner() {
           <BigButton variant="ghost" onClick={clear} className="col-span-2">Clear (Esc)</BigButton>
         </div>
 
-        <QuickCast sessionId={sessionId} />
+        {/* Tabs: Control / Alerts / Theme */}
+        <div className="rounded-xl border border-white/10 bg-zinc-900/40 p-1">
+          <div className="grid grid-cols-3 gap-1 text-xs">
+            {(["control", "alerts", "theme"] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setRightTab(t)}
+                className={`rounded-md px-2 py-1.5 font-semibold uppercase tracking-wider ${
+                  rightTab === t
+                    ? "bg-emerald-500/15 text-emerald-200"
+                    : "text-white/50 hover:bg-white/5"
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {rightTab === "control" && (
+          <>
+            <QuickCast sessionId={sessionId} />
+            <CountdownPanel sessionId={sessionId} />
+          </>
+        )}
+        {rightTab === "alerts" && (
+          <AlertBar sessionId={sessionId} current={state?.overlay} />
+        )}
+        {rightTab === "theme" && (
+          <ThemePanel sessionId={sessionId} theme={session?.theme} />
+        )}
 
         {sessionSlug && (
-          <div className="rounded-xl border border-white/10 bg-zinc-900/40 p-3 text-xs text-white/60">
-            <div className="mb-1 font-semibold uppercase tracking-wider text-white/50">Projector URL</div>
-            <a
-              href={`/live/${sessionSlug}`}
-              target="_blank"
-              rel="noreferrer"
-              className="block break-all text-emerald-400 hover:underline"
-            >
-              {window.location.origin}/live/{sessionSlug}
-            </a>
-            <div className="mt-2 text-white/40">Open in a second window or on the projector display.</div>
+          <div className="rounded-xl border border-white/10 bg-zinc-900/40 p-3 text-xs">
+            <div className="mb-2 font-semibold uppercase tracking-wider text-white/50">
+              Outputs
+            </div>
+            <div className="space-y-1.5">
+              <OutputLink
+                label="Projector"
+                href={`/live/${sessionSlug}`}
+                hint="Audience screen"
+              />
+              <OutputLink
+                label="Stage Display"
+                href={`/stage/${sessionSlug}`}
+                hint="Confidence monitor (current + next + clock)"
+              />
+            </div>
           </div>
         )}
       </section>
     </div>
+  );
+}
+
+function OutputLink({ label, href, hint }: { label: string; href: string; hint: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="block rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 hover:border-emerald-400/40"
+    >
+      <div className="flex items-center justify-between">
+        <span className="font-semibold text-emerald-400">{label} ↗</span>
+        <span className="text-[10px] text-white/30">{href}</span>
+      </div>
+      <div className="text-[11px] text-white/40">{hint}</div>
+    </a>
   );
 }

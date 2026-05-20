@@ -91,18 +91,33 @@ function Editor() {
     const j = i + dir;
     if (i < 0 || j < 0 || j >= items.length) return;
     const a = items[i], b = items[j];
-    // swap positions
     await supabase.from("service_items").update({ position: -1 }).eq("id", a.id);
     await supabase.from("service_items").update({ position: a.position }).eq("id", b.id);
     await supabase.from("service_items").update({ position: b.position }).eq("id", a.id);
     refresh();
   };
 
-  const remove = async (id: string) => {
-    if (!confirm("Remove this item?")) return;
-    await supabase.from("service_items").delete().eq("id", id);
+  const reorderTo = async (sourceId: string, targetIndex: number) => {
+    const items = [...(itemsQ.data ?? [])];
+    const srcIdx = items.findIndex((x) => x.id === sourceId);
+    if (srcIdx === -1) return;
+    const [moved] = items.splice(srcIdx, 1);
+    items.splice(targetIndex, 0, moved);
+    // Two-pass to dodge unique constraint races: write negative tmp positions first
+    await Promise.all(
+      items.map((it, i) =>
+        supabase.from("service_items").update({ position: -(i + 1) - 1000 }).eq("id", it.id)
+      )
+    );
+    await Promise.all(
+      items.map((it, i) =>
+        supabase.from("service_items").update({ position: i }).eq("id", it.id)
+      )
+    );
     refresh();
   };
+
+
 
   const goLive = async (item: ServiceItem) => {
     if (!sessionId) return toast.error("No live session yet");
