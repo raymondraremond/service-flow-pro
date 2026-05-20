@@ -313,6 +313,7 @@ export type Database = {
         | "verse"
         | "media"
         | "blank"
+        | "countdown"
       service_item_kind: "song" | "scripture" | "announcement" | "media"
     }
     CompositeTypes: {
@@ -442,7 +443,15 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "operator"],
-      presentation_mode: ["slide", "black", "logo", "verse", "media", "blank"],
+      presentation_mode: [
+        "slide",
+        "black",
+        "logo",
+        "verse",
+        "media",
+        "blank",
+        "countdown",
+      ],
       service_item_kind: ["song", "scripture", "announcement", "media"],
     },
   },
