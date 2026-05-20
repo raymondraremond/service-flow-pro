@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as StageSlugRouteImport } from './routes/stage/$slug'
 import { Route as LiveSlugRouteImport } from './routes/live/$slug'
 import { Route as AppSongsIndexRouteImport } from './routes/app/songs/index'
 import { Route as AppServicesIndexRouteImport } from './routes/app/services/index'
@@ -32,6 +33,11 @@ const IndexRoute = IndexRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/app/',
   path: '/app/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StageSlugRoute = StageSlugRouteImport.update({
+  id: '/stage/$slug',
+  path: '/stage/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LiveSlugRoute = LiveSlugRouteImport.update({
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/live/$slug': typeof LiveSlugRoute
+  '/stage/$slug': typeof StageSlugRoute
   '/app/': typeof AppIndexRoute
   '/app/services/$serviceId': typeof AppServicesServiceIdRoute
   '/app/songs/$songId': typeof AppSongsSongIdRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/live/$slug': typeof LiveSlugRoute
+  '/stage/$slug': typeof StageSlugRoute
   '/app': typeof AppIndexRoute
   '/app/services/$serviceId': typeof AppServicesServiceIdRoute
   '/app/songs/$songId': typeof AppSongsSongIdRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/live/$slug': typeof LiveSlugRoute
+  '/stage/$slug': typeof StageSlugRoute
   '/app/': typeof AppIndexRoute
   '/app/services/$serviceId': typeof AppServicesServiceIdRoute
   '/app/songs/$songId': typeof AppSongsSongIdRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/live/$slug'
+    | '/stage/$slug'
     | '/app/'
     | '/app/services/$serviceId'
     | '/app/songs/$songId'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/live/$slug'
+    | '/stage/$slug'
     | '/app'
     | '/app/services/$serviceId'
     | '/app/songs/$songId'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/live/$slug'
+    | '/stage/$slug'
     | '/app/'
     | '/app/services/$serviceId'
     | '/app/songs/$songId'
@@ -139,6 +151,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   LiveSlugRoute: typeof LiveSlugRoute
+  StageSlugRoute: typeof StageSlugRoute
   AppIndexRoute: typeof AppIndexRoute
   AppServicesServiceIdRoute: typeof AppServicesServiceIdRoute
   AppSongsSongIdRoute: typeof AppSongsSongIdRoute
@@ -168,6 +181,13 @@ declare module '@tanstack/react-router' {
       path: '/app'
       fullPath: '/app/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stage/$slug': {
+      id: '/stage/$slug'
+      path: '/stage/$slug'
+      fullPath: '/stage/$slug'
+      preLoaderRoute: typeof StageSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/live/$slug': {
@@ -219,6 +239,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   LiveSlugRoute: LiveSlugRoute,
+  StageSlugRoute: StageSlugRoute,
   AppIndexRoute: AppIndexRoute,
   AppServicesServiceIdRoute: AppServicesServiceIdRoute,
   AppSongsSongIdRoute: AppSongsSongIdRoute,
@@ -229,3 +250,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

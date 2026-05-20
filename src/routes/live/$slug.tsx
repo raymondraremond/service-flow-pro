@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { usePresentation } from "@/hooks/usePresentation";
+import { usePresentation, useSession } from "@/hooks/usePresentation";
 import { SlideRenderer } from "@/components/projector/SlideRenderer";
 
 export const Route = createFileRoute("/live/$slug")({
@@ -42,6 +42,7 @@ function Projector() {
   }, []);
 
   const { state } = usePresentation(sessionId);
+  const session = useSession(sessionId);
 
   if (notFound) {
     return (
@@ -52,7 +53,7 @@ function Projector() {
   }
   return (
     <div style={{ cursor: cursor ? "default" : "none" }}>
-      <SlideRenderer state={state} />
+      <SlideRenderer state={state} theme={session?.theme} />
     </div>
   );
 }

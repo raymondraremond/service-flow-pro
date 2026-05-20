@@ -7,7 +7,20 @@ export type PresentationMode =
   | "logo"
   | "verse"
   | "media"
+  | "countdown"
   | "blank";
+
+export type SessionTheme = {
+  bg?: string;          // hex e.g. "#000000"
+  accent?: string;      // hex
+  welcome?: string;     // welcome text shown on logo screen
+  font?: "sans" | "serif" | "display";
+};
+
+export type Overlay = {
+  alert?: string;       // lower-third banner text
+  alert_kind?: "info" | "urgent";
+};
 
 export type PresentationState = {
   id: string;
@@ -22,11 +35,22 @@ export type PresentationState = {
     verse_text?: string;
     announcement?: string;
     image_url?: string;
+    countdown_to?: string;     // ISO timestamp
+    countdown_message?: string;
   };
+  overlay: Overlay;
   updated_at: string;
 };
 
-// Single-session realtime hook. Sets up subscribe + polling fallback.
+export type Session = {
+  id: string;
+  slug: string;
+  name: string;
+  owner_id: string | null;
+  is_active: boolean;
+  theme: SessionTheme;
+};
+
 export function usePresentation(sessionId: string | null) {
   const [state, setState] = useState<PresentationState | null>(null);
   const [connected, setConnected] = useState(false);
@@ -63,7 +87,6 @@ export function usePresentation(sessionId: string | null) {
         setConnected(status === "SUBSCRIBED");
       });
 
-    // polling fallback every 2s if disconnected
     pollRef.current = window.setInterval(() => {
       fetchOnce();
     }, 2000);
@@ -77,19 +100,66 @@ export function usePresentation(sessionId: string | null) {
   return { state, connected, refresh: fetchOnce };
 }
 
+export function useSession(sessionId: string | null) {
+  const [session, setSession] = useState<Session | null>(null);
+  useEffect(() => {
+    if (!sessionId) return;
+    let cancel = false;
+    const load = async () => {
+      const { data } = await supabase
+        .from("presentation_sessions")
+        .select("*")
+        .eq("id", sessionId)
+        .maybeSingle();
+      if (!cancel && data) setSession(data as unknown as Session);
+    };
+    load();
+    const ch = supabase
+      .channel(`sess:${sessionId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "presentation_sessions", filter: `id=eq.${sessionId}` },
+        (p) => p.new && setSession(p.new as unknown as Session)
+      )
+      .subscribe();
+    const t = window.setInterval(load, 4000);
+    return () => {
+      cancel = true;
+      supabase.removeChannel(ch);
+      window.clearInterval(t);
+    };
+  }, [sessionId]);
+  return session;
+}
+
 export async function updatePresentation(
   sessionId: string,
   patch: Partial<Omit<PresentationState, "id" | "session_id" | "updated_at">>
 ) {
   const { error } = await supabase
     .from("presentation_state")
-    .update(patch as never)
+    .update({ ...(patch as never), updated_at: new Date().toISOString() } as never)
     .eq("session_id", sessionId);
   if (error) throw error;
 }
 
+export async function updateOverlay(sessionId: string, overlay: Overlay) {
+  const { error } = await supabase
+    .from("presentation_state")
+    .update({ overlay, updated_at: new Date().toISOString() } as never)
+    .eq("session_id", sessionId);
+  if (error) throw error;
+}
+
+export async function updateTheme(sessionId: string, theme: SessionTheme) {
+  const { error } = await supabase
+    .from("presentation_sessions")
+    .update({ theme } as never)
+    .eq("id", sessionId);
+  if (error) throw error;
+}
+
 export async function ensureDefaultSession(userId: string) {
-  // Find an existing active session owned by user, else create one.
   const { data: existing } = await supabase
     .from("presentation_sessions")
     .select("*")
