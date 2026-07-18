@@ -76,11 +76,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Church Media — Live Service Control" },
       { name: "description", content: "Operator dashboard and projector display for controlling church service media in real time." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Church Media — Live Service Control" },
+      { property: "og:description", content: "Operator dashboard and projector display for controlling church service media in real time." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Church Media — Live Service Control" },
+      { name: "twitter:description", content: "Operator dashboard and projector display for controlling church service media in real time." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8a65054b-8845-4b2c-bd04-fa3ad4d8ede4/id-preview-da9d6e96--4f18d2a4-74fc-400b-adc9-e385ee738ba3.lovable.app-1784380623278.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8a65054b-8845-4b2c-bd04-fa3ad4d8ede4/id-preview-da9d6e96--4f18d2a4-74fc-400b-adc9-e385ee738ba3.lovable.app-1784380623278.png" },
     ],
     links: [
       {
