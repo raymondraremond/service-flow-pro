@@ -15,6 +15,8 @@ export type SessionTheme = {
   accent?: string;      // hex
   welcome?: string;     // welcome text shown on logo screen
   font?: "sans" | "serif" | "display";
+  bg_video_url?: string; // looping motion background URL (mp4/webm)
+  bg_video_dim?: number; // 0..1 dark overlay opacity (default 0.45)
 };
 
 export type Overlay = {
