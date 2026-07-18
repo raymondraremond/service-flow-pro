@@ -17,6 +17,7 @@ import { AlertBar } from "@/components/control/AlertBar";
 import { CountdownPanel } from "@/components/control/CountdownPanel";
 import { ThemePanel } from "@/components/control/ThemePanel";
 import { MediaCast } from "@/components/control/MediaCast";
+import { MotionPanel } from "@/components/control/MotionPanel";
 import { CommandPalette } from "@/components/control/CommandPalette";
 import { toast, Toaster } from "sonner";
 
@@ -272,7 +273,10 @@ function DashboardInner() {
           <AlertBar sessionId={sessionId} current={state?.overlay} />
         )}
         {rightTab === "theme" && (
-          <ThemePanel sessionId={sessionId} theme={session?.theme} />
+          <>
+            <ThemePanel sessionId={sessionId} theme={session?.theme} />
+            <MotionPanel sessionId={sessionId} theme={session?.theme} />
+          </>
         )}
 
         {sessionSlug && (
