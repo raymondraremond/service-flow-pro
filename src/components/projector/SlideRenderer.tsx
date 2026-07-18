@@ -6,6 +6,8 @@ type Props = { state: PresentationState | null; theme?: SessionTheme };
 export function SlideRenderer({ state, theme }: Props) {
   const bg = theme?.bg ?? "#000000";
   const accent = theme?.accent ?? "#10b981";
+  const videoUrl = theme?.bg_video_url;
+  const dim = theme?.bg_video_dim ?? 0.45;
   const fontClass =
     theme?.font === "serif"
       ? "font-serif"
@@ -17,11 +19,35 @@ export function SlideRenderer({ state, theme }: Props) {
     ? `${state.mode}-${state.current_slide_index}-${state.updated_at}`
     : "empty";
 
+  // Hide the video background for modes where it would compete with content
+  // (fullscreen media image, dedicated black screen).
+  const showVideo =
+    !!videoUrl &&
+    state?.mode !== "black" &&
+    !(state?.mode === "media" && state.payload?.image_url);
+
   return (
     <div
       className={`relative h-screen w-screen overflow-hidden ${fontClass}`}
       style={{ background: bg }}
     >
+      {showVideo && (
+        <>
+          <video
+            key={videoUrl}
+            src={videoUrl}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: `rgba(0,0,0,${dim})` }}
+          />
+        </>
+      )}
       <FadeLayer k={k}>
         <Inner state={state} theme={theme} accent={accent} />
       </FadeLayer>
