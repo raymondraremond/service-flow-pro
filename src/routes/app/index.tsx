@@ -16,6 +16,8 @@ import { QuickCast } from "@/components/control/QuickCast";
 import { AlertBar } from "@/components/control/AlertBar";
 import { CountdownPanel } from "@/components/control/CountdownPanel";
 import { ThemePanel } from "@/components/control/ThemePanel";
+import { MediaCast } from "@/components/control/MediaCast";
+import { CommandPalette } from "@/components/control/CommandPalette";
 import { toast, Toaster } from "sonner";
 
 export const Route = createFileRoute("/app/")({
@@ -262,6 +264,7 @@ function DashboardInner() {
         {rightTab === "control" && (
           <>
             <QuickCast sessionId={sessionId} />
+            <MediaCast sessionId={sessionId} />
             <CountdownPanel sessionId={sessionId} />
           </>
         )}
@@ -292,6 +295,7 @@ function DashboardInner() {
           </div>
         )}
       </section>
+      <CommandPalette sessionId={sessionId} />
     </div>
   );
 }
